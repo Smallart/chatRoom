@@ -4,6 +4,7 @@ import com.jxust.we_chat_together.domain.UserInfo;
 import com.jxust.we_chat_together.domain.UserInfoMap;
 import com.jxust.we_chat_together.service.GroupService;
 import com.jxust.we_chat_together.service.UserService;
+import com.jxust.we_chat_together.utils.MD5Util;
 import com.jxust.we_chat_together.utils.SessionUtil;
 import com.jxust.we_chat_together.utils.TaskUtil;
 import com.jxust.we_chat_together.utils.UserUtil;
@@ -51,6 +52,7 @@ public class LoginController {
             session.setAttribute("message","密码或用户名不能为空");
             return "/chatroom";
         }
+        user.setUserPassword(MD5Util.textToMD5L16(user.getUserPassword()));
         User u=userService.userLogin(user);
         if (u!=null){
             session.setAttribute("user",u);
@@ -88,6 +90,7 @@ public class LoginController {
     //注册该用户
     @RequestMapping(value = "/registerUser",method = RequestMethod.POST)
     public String registerUser(User user){
+        user.setUserPassword(MD5Util.textToMD5L16(user.getUserPassword()));
         userService.registerUser(user);
         return "redirect:/chatroom";
     }
@@ -112,44 +115,47 @@ public class LoginController {
         Map<String, Map<String, UserInfoMap>> infoMap = UserUtil.getInfoMap();
         //userInfos 用户未读信息
         Map<String, UserInfoMap> userInfos = infoMap.get(uid);
-
         //将没有动过的消息处理掉
-        Set<String> keys = userInfos.keySet();
-        for (String key:keys){
-            UserInfoMap userInfoMap = userInfos.get(key);
-            for (UserInfoMap userInfo:userInfoMaps){
-                if (userInfo.getFromId()==userInfoMap.getFromId()){
-                    Iterator<UserInfo> iterator = userInfoMap.getInfoList().iterator();
-                    while(iterator.hasNext()){
-                        if (iterator.next().getId()!=null) iterator.remove();
+        if (userInfos!=null){
+            Set<String> keys = userInfos.keySet();
+            for (String key:keys){
+                UserInfoMap userInfoMap = userInfos.get(key);
+                for (UserInfoMap userInfo:userInfoMaps){
+                    if (userInfo.getFromId()==userInfoMap.getFromId()){
+                        Iterator<UserInfo> iterator = userInfoMap.getInfoList().iterator();
+                        while(iterator.hasNext()){
+                            if (iterator.next().getId()!=null) iterator.remove();
+                        }
                     }
                 }
+                saveTheMessage(id,userInfoMap);
             }
-            saveTheMessage(id,userInfoMap);
         }
+
 
         //获取程序运行中已读信息
         Map<String, Map<String, UserInfoMap>> readedInfoMap = UserUtil.getReadedInfoMap();
         Map<String, UserInfoMap> userReadedInfo = readedInfoMap.get(uid);
-        Set<String> readKeys = userReadedInfo.keySet();
-        //将其存入到数据库中
-        for (String key:readKeys){
-            UserInfoMap userInfoMap = userReadedInfo.get(key);
-            for (UserInfoMap userInfo:userInfoMaps){
-                if (userInfo.getFromId()==userInfoMap.getFromId()){
-                    Iterator<UserInfo> iterator = userInfoMap.getInfoList().iterator();
-                    while(iterator.hasNext()){
-                        UserInfo next = iterator.next();
-                        if (next.getId()!=null){
-                            userService.changInfosState(next);
-                            iterator.remove();
+        if (userReadedInfo!=null){
+            Set<String> readKeys = userReadedInfo.keySet();
+            //将其存入到数据库中
+            for (String key:readKeys){
+                UserInfoMap userInfoMap = userReadedInfo.get(key);
+                for (UserInfoMap userInfo:userInfoMaps){
+                    if (userInfo.getFromId()==userInfoMap.getFromId()){
+                        Iterator<UserInfo> iterator = userInfoMap.getInfoList().iterator();
+                        while(iterator.hasNext()){
+                            UserInfo next = iterator.next();
+                            if (next.getId()!=null){
+                                userService.changInfosState(next);
+                                iterator.remove();
+                            }
                         }
                     }
                 }
+                saveTheMessage(id,userInfoMap);
             }
-            saveTheMessage(id,userInfoMap);
         }
-
         userInfos.clear();
         readedInfoMap.clear();
 
@@ -165,6 +171,25 @@ public class LoginController {
                     userService.addFriendWithInfo(id,endCount--,userInfoMap.getFromId());
                 }
             }
+    }
+    @PostMapping("/modifyThePassword")
+    public String modifyThePassword(@RequestParam("modifyByName") String userName,
+                                  @RequestParam("modifyPassWord") String password){
+        String pswd = MD5Util.textToMD5L16(password);
+        userService.updateUserPsw(pswd,userName);
+        return "redirect:/chatroom";
+    }
+    @ResponseBody
+    @GetMapping("/modifyByName")
+    public String modifyByName(@RequestParam("modifyByName") String name){
+        String s;
+        if (name==null){
+            s="{\"valid\":"+false+"}";
+        }else{
+            Boolean extis =userService.checkLoginUserName(name);
+            s="{\"valid\":"+extis+"}";
+        }
+        return s;
     }
 
     @PreDestroy

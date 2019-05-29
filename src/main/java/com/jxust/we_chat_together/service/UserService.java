@@ -41,4 +41,6 @@ public interface UserService {
     int addFriendWithInfo(int uid,int infoId,int fromId);
     //修改以读信息状态
     int changInfosState(UserInfo userInfo);
+    //修改用户密码
+    int updateUserPsw(String password,String uname);
 }

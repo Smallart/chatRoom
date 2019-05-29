@@ -99,4 +99,9 @@ public class UserDaoImpl implements UserDao {
         return userMapper.changInfosState(userInfos);
     }
 
+    @Override
+    public int updateUserPsw(String password, String uname) {
+        return userMapper.updateUserPsw(password,uname);
+    }
+
 }

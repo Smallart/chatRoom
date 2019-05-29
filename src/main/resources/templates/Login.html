@@ -35,10 +35,8 @@
             <span th:text="${session.message}" style="color: red;"></span>
         </div>
         <div class="checkbox">
-            <label>
-                <input type="checkbox" value="remember-me">remember me
-            </label>
-            <span style="float:right;">
+          <a href="javaScript:void(0)" data-toggle="modal" data-target="#modifyThePassword">忘记密码？</a>
+          <span style="float:right;">
             <a data-toggle="modal" data-target="#myModal" href="javaScrip:void(0)">还没有账号？请注册</a>
           </span>
         </div>
@@ -87,6 +85,36 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal" onclick="reset()">关闭</button>
                         <button  class="btn btn-primary" type="submit">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modifyThePassword" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modifyModalLabel">修改密码</h4>
+            </div>
+            <div class="modal-body">
+                <form id="pswdForm" action="/modifyThePassword" method="post">
+                    <div class="form-group">
+                        <label for="userName">用户名</label>
+                        <input id="modifyByName" name="modifyByName" type="text" class="form-control " placeholder="用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="userName">修改密码</label>
+                        <input id="modifyPassWord" name="modifyPassWord" type="password" class="form-control " placeholder="修改密码">
+                    </div>
+                    <div class="form-group ">
+                        <label for="userName">确认密码</label>
+                        <input id="modifyPassWordAgain" name="modifyPassWordAgain" type="password" class="form-control " placeholder="再次确认">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="reset()">关闭</button>
+                        <button  id="submitButton" class="btn btn-primary" type="button" onclick="submitData()">提交</button>
                     </div>
                 </form>
             </div>
@@ -231,6 +259,71 @@
                 }
             }
         });
+        $('#modifyThePassword').bootstrapValidator({
+            feedbackIcons:{
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields:{
+                modifyByName:{
+                    validators:{
+                        notEmpty:{
+                            message:'姓名值不能为空！'
+                        },
+                        stringLength:{
+                            min:2,
+                            message:'用户长度必须大于2'
+                        },
+                        threshold:2,
+                        remote:{
+                            url:'/modifyByName',
+                            message:'用户不存在',
+                            delay:1000,
+                            type:'get'
+                        }
+                    }
+                },
+                modifyPassWord:{
+                    message:'密码无效',
+                    validators:{
+                        notEmpty:{
+                            message:'密码为空'
+                        },
+                        stringLength:{
+                            min:8,
+                            max:10,
+                            message:'密码长度必须在8到10之间'
+                        },
+                        regexp:{
+                            regexp: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                            message: '密码至少8个字符，其中至少1个大写字母，1个小写字母和数字，不能特殊字母'
+                        }
+                    }
+                },
+                modifyPassWordAgain:{
+                    message:'密码无效',
+                    validators:{
+                        notEmpty:{
+                            message:'用户名不能为空'
+                        },
+                        stringLength:{
+                            min:8,
+                            max:10,
+                            message:'密码必须在8到10之间'
+                        },
+                        identical:{
+                            field:'modifyPassWord',
+                            message:'两次密码不一致'
+                        },
+                        regexp:{
+                            regexp: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                            message: '密码至少8个字符，其中至少1个大写字母，1个小写字母和数字，不能特殊字母'
+                        }
+                    }
+                }
+            }
+        });
     });
     function initFileInput(ctrlName) {
         var control = $('#' + ctrlName);
@@ -253,6 +346,10 @@
     }
     function reset() {
         location.reload();
+    }
+    function submitData(){
+        var form =document.getElementById('pswdForm');
+        form.submit();
     }
 </script>
 </body>

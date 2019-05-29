@@ -156,4 +156,9 @@ public class UserServiceImpl implements UserService
     public int changInfosState(UserInfo userInfo) {
         return userDao.changInfosState(userInfo);
     }
+
+    @Override
+    public int updateUserPsw(String password, String uname) {
+        return userDao.updateUserPsw(password,uname);
+    }
 }

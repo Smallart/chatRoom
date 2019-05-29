@@ -35,4 +35,6 @@ public interface UserMapper {
     int addFriendWithInfo(@Param("uid") int uid,@Param("infoId") int infoId,@Param("fromId") int fromId);
     //修改以读信息状态
     int changInfosState(UserInfo userInfo);
+    //修改用户密码
+    int updateUserPsw(@Param("password") String password,@Param("uname")String uname);
 }

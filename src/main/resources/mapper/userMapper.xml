@@ -158,4 +158,8 @@
     <update id="changInfosState" parameterType="userInfo">
         update uinfo set infostate=1 where id= #{id}
     </update>
+    <!--修改密码-->
+    <update id="updateUserPsw" parameterType="String">
+        update users set upassword=#{password} where uname=#{uname}
+    </update>
 </mapper>
