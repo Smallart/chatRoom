@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jxust.we_chat_together.mapper.UserMapper">
+    <resultMap id="user" type="User">
+        <id property="id" column="id"></id>
+        <result property="userId" column="ucid"></result>
+        <result property="userName" column="uname"></result>
+        <result property="userPassword" column="upassword"></result>
+        <result property="userPhoneNum" column="uphonenum"></result>
+        <result property="userGender" column="ugender"></result>
+        <result property="userHeadImg" column="uheadimg"></result>
+        <result property="userState" column="ustate"></result>
+    </resultMap>
+    <resultMap id="userList" type="UserList">
+        <result column="uid" property="uid"></result>
+        <collection property="friendList" ofType="User">
+            <id property="id" column="id"></id>
+            <result property="userId" column="ucid"></result>
+            <result property="userName" column="uname"></result>
+            <result property="userPhoneNum" column="uphonenum"></result>
+            <result property="userGender" column="ugender"></result>
+            <result property="userHeadImg" column="uheadimg"></result>
+            <result property="userState" column="ustate"></result>
+        </collection>
+    </resultMap>
+    <resultMap id="userWithGroup" type="User">
+        <result column="ucid" property="userId"></result>
+        <result column="uname" property="userName"></result>
+        <collection property="groups" ofType="Group">
+            <id column="id" property="gid"></id>
+            <result column="ugid" property="guuId"></result>
+            <result column="gname" property="groupName"></result>
+            <result column="gimg" property="groupImg"></result>
+        </collection>
+    </resultMap>
+    <!--查找所有用户-->
+    <select id="getUser" resultMap="user">
+        SELECT
+          *
+         from
+         users;
+    </select>
+    <!--通过注册页面返回的数据来验证该用户是否存在-->
+    <select id="checkUserByName" resultType="User" parameterType="String">
+        SELECT *
+        from users
+        WHERE uname=#{name}
+    </select>
+    <!--注册用户-->
+    <insert id="registerUser" parameterType="User">
+        insert into
+        users(ucid,uname,upassword,uphonenum,ugender,uheadimg,ustate)
+        values(#{userId},#{userName},#{userPassword},
+        #{userPhoneNum},#{userGender},#{userHeadImg},#{userState})
+    </insert>
+    <!--验证登录信息-->
+    <select id="userLogin" parameterType="User" resultMap="user">
+        SELECT *
+        from users
+        where uname=#{userName} and upassword=#{userPassword}
+    </select>
+    <!--修改用户状态-->
+    <update id="updateUserState" parameterType="User">
+        update users
+        set ustate=#{userState}
+        where id=#{id}
+    </update>
+    <!--获取好友列表-->
+    <select id="getFriendsList" resultMap="userList" parameterType="Integer">
+      SELECT ul.uid,u.id,u.ucid,u.uname,u.uheadimg,u.ustate,u.ugender,u.uphonenum
+      FROM users u,userlist ul
+      WHERE u.id=ul.friendid
+      AND ul.uid=#{uid};
+    </select>
+    <resultMap id="infoList" type="UserInfoMap">
+        <result property="fromId" column="fromid"></result>
+        <collection property="infoList" ofType="UserInfo">
+            <id property="id" column="id"></id>
+            <result property="message" column="message"></result>
+            <result property="infotime" column="infotime"></result>
+            <result property="state" column="infostate"></result>
+        </collection>
+    </resultMap>
+    <!--获取好友发送的信息-->
+    <select id="getUserInfo" resultMap="infoList" parameterType="int">
+        SELECT u.id,uf.fromid,u.message,u.infotime,u.infostate
+        FROM user_info uf,uinfo u
+        WHERE u.id=uf.infoid
+        AND uid=#{uid} And u.infostate=0;
+    </select>
+    <!--获取用户信息-->
+    <select id="LoginOut" resultType="User" parameterType="String">
+        SELECT *
+        FROM users
+        WHERE ucid=#{uid}
+    </select>
+    <!--删除好友-->
+    <delete id="deleteFriendByUserId">
+        delete from userlist
+        where
+        uid=#{uId} and
+        friendid=#{friendId}
+    </delete>
+    <!--通过用户姓名或电话号码模糊查询-->
+    <select id="searchUsers" resultMap="user" parameterType="String">
+        select id,uname,uphonenum,uheadimg,ustate,ucid
+        from users
+        where uname like "%"#{content}"%"
+        or uphonenum like "%"#{content}"%"
+    </select>
+
+    <select id="getUserGroup" parameterType="int" resultMap="userWithGroup">
+        select u.ucid,u.uname,ug.id,ug.ugid,ug.gname,ug.gimg from
+        users u,user_group_role ugr,usersgroup ug
+        where u.id=ugr.uid and ugr.gid=ug.id and u.id=#{id}
+    </select>
+    <!--添加好友-->
+    <insert id="userAddFriend" parameterType="Integer">
+        INSERT into
+        userlist(uid, friendid)
+        values(#{uId},#{fId})
+    </insert>
+    <!--通过id查找好友-->
+    <select id="findUserById" resultMap="user" parameterType="Integer">
+        SELECT *
+        from users
+        where id=#{uid}
+    </select>
+    <!--添加用户到群组-->
+    <insert id="addGroup" parameterType="Integer">
+        INSERT into
+        user_group_role(uid, gid, rid)
+        values(#{uId},#{gId},#{rId});
+    </insert>
+    <!--将数据插入到数据库中-->
+    <insert id="addFriendInfos" parameterType="java.util.List">
+        INSERT into uinfo(
+          message,
+          infotime,
+          infostate
+        )
+        values
+        <foreach collection="userInfos" item="userInfo" separator=",">
+          (
+          #{userInfo.message},
+          #{userInfo.infotime},
+          #{userInfo.state}
+          )
+        </foreach>
+    </insert>
+    <!--关联信息与用户之间的联系-->
+    <!--故意的-->
+    <insert id="addFriendWithInfo" parameterType="Integer">
+        INSERT into user_info(fromid, uid, infoid)
+        VALUES (#{uid},#{fromId},#{infoId});
+    </insert>
+    <!--更新数据库中信息-->
+    <update id="changInfosState" parameterType="userInfo">
+        update uinfo set infostate=1 where id= #{id}
+    </update>
+</mapper>

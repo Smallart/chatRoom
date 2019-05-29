@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jxust.we_chat_together.mapper.GroupMapper">
+    <resultMap id="group" type="Group">
+        <id column="id" property="gid"></id>
+        <result column="ugid" property="guuId"></result>
+        <result column="gname" property="groupName"></result>
+        <result column="gimg" property="groupImg"></result>
+    </resultMap>
+    <resultMap id="allGroups" type="Group">
+        <id column="id" property="gid"></id>
+        <result column="ugid" property="guuId"></result>
+        <result column="gname" property="groupName"></result>
+        <result column="gimg" property="groupImg"></result>
+        <collection property="users" ofType="User">
+            <result column="ucid" property="userId"></result>
+            <result column="uname" property="userName"></result>
+            <result column="uheadimg" property="userHeadImg"></result>
+        </collection>
+        <collection property="userWithRoles" ofType="UserWithRole">
+            <result column="ucid" property="uuid"></result>
+            <association property="role" javaType="Role">
+                <result column="rolename" property="roleName"></result>
+                <result column="privilege" property="privilege"></result>
+            </association>
+        </collection>
+    </resultMap>
+    <!--获取角色身份-->
+    <select id="getAllRole" resultType="Role">
+        Select *
+        from
+        role
+    </select>
+    <!--检测群名是否存在-->
+    <select id="checkGroupName" resultMap="group" parameterType="String">
+        SELECT *
+        from
+        usersgroup
+        WHERE
+        gname=#{groupName}
+    </select>
+    <!--获取群组中最大值-->
+    <select id="getMaxIdFromGroup" resultType="int">
+        SELECT MAX(id)
+        from usersgroup;
+    </select>
+    <!--添加群-->
+    <insert id="addGroup" parameterType="group">
+        INSERT into usersgroup(ugid,gname,gimg)
+        values(#{guuId},#{groupName},#{groupImg});
+    </insert>
+    <!--添加用户与群组的关系-->
+    <insert id="insertUserAndGroup" parameterType="UserGourpRole">
+        INSERT into user_group_role(uid, gid, rid)
+        values(#{userId},#{groupId},#{roleId});
+    </insert>
+    <!--获得群组中的群成员-->
+    <select id="getAllGroups" resultMap="allGroups" parameterType="Integer">
+      select u.ucid,u.uname,u.uheadimg,r.rolename,r.privilege,ug.ugid,ug.gimg,ug.gname,ug.id
+      from
+      users u,user_group_role ugr,role r,usersgroup ug
+      where
+      u.id=ugr.uid AND r.id=ugr.rid AND ug.id=ugr.gid and ug.id=#{gid};
+    </select>
+    <!--通过群组Id获取群组信息-->
+    <select id="findGroupById" resultMap="group" parameterType="Integer">
+        SELECT *
+        from usersgroup
+        where id=#{gid}
+    </select>
+    <!--查询群组-->
+    <select id="searchGroups" resultMap="group" parameterType="String">
+        SELECT *
+        from usersgroup
+        where gname like "%"#{content}"%"
+        or ugid like "%"#{content}"%"
+    </select>
+    <!--退出群聊-->
+    <delete id="exitGourp" parameterType="Integer">
+        DELETE FROM user_group_role
+        where uid=#{uId} and gid=#{gId}
+    </delete>
+    <!--获取信息表中的最大ID-->
+    <select id="getInfoMaxCount" resultType="int">
+        SELECT MAX(id)
+        from uinfo;
+    </select>
+</mapper>

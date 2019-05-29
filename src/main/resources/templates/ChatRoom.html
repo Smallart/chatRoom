@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Chat</title>
+    <link href="../static/css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/main.css" th:href="@{css/main.css}">
+    <link href="../static/css/bootstrapValidator.min.css">
+    <script type="text/javascript" src="../static/js/emoji.js"></script>
+    <link href="../static/css/fileinput.min.css" th:href="@{css/fileinput.min.css}" rel="stylesheet">
+    <style type="text/css">
+    	#chatBody{
+    		width: 960px;
+    		height: 620px;
+    		margin: 0 auto;
+    		padding: 2px 0;
+    		border-radius: 15px;
+            box-shadow: 6px 6px 3px #888888;
+    	}
+    	.bg{
+		    width:100%;
+		    height:100%;
+		    position: relative;
+		    background: url("../static/img/cold-snow.jpg") no-repeat fixed;
+		    padding:1px;
+		    box-sizing:border-box;
+		    z-index:1;
+		}
+		.left{
+			margin: 0px;
+			padding: 0px;
+			width: 320px;
+			height: 624px;
+            display: inline;
+            float: left;
+            border-radius:15px 0 0 15px;
+            background-color: #E9E9EA;
+		}
+		.right{
+			margin: 0px;
+			padding: 0px;
+			width: 640px;
+			height: 624px;
+      display: inline;
+      float: right;
+			border-radius:0 15px 15px 0;
+			background-color:#363433;
+		}
+    .bgcolor{
+      background-color:#2E3238;
+    }
+    #menu{
+        width: 320px;
+        height: 160px;
+        border-radius:15px 0 0;
+    }
+    #userInfo{
+      width: 320px;
+      height: 80px;
+      border-radius:15px 0 0;
+    }
+    #search{
+      width: 320px;
+      height: 40px;
+    }
+    .contentTopName{
+      width: 640px;
+      height: 60px;
+      background-color:white;
+      border-radius:0 15px 0 0;
+    }
+    .content{
+      position:relative;
+      width: 640px;
+      height: 400px;
+      background-color:skyblue;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    #headimg{
+      height: 80px;
+      width: 80px;
+      padding: 10px 10px 10px 20px;
+      display: block;
+      float: left;
+    }
+    #name{
+      height: 80px;
+      display: block;
+      float: left;
+      font:bold 14px sans-serif;
+      line-height: 80px;
+      color: #E9E9EA; 
+    }
+    #menu_option{
+      height: 80px;
+      display: block;
+      float: right;
+      padding: 20px 30px 0 0;
+    }
+    #searrch_ico{
+      position:static;
+    }
+    .pre-scrollable {
+      height: 462px;
+      position:relative;
+      max-height: 462px;
+      overflow-y: auto;
+      border-radius:0px 0 0 15px;
+    }
+    .items{
+      height: 70px;
+      border-radius:15px 0 0 15px;
+      padding: 0px;
+    }
+    .frindlistinfo{
+      height: 60px;
+      padding-left: 20px;
+    }
+    .friendsImg{
+      height:60px;
+      width: 60px;
+      display: block;
+      float: left;
+      padding-right: 10px;
+    }
+    h4{
+      font:bold 14px sans-serif;
+    }
+    .unread{
+      position: absolute;
+      background-color: red;
+      top: 10px;
+      left: 275px;
+    }
+    #sendBut{
+      position: relative;
+       top: 5px;
+      left: 555px;
+    }
+    .contentMessage{
+      width: 100%;
+      height: 65px;
+    }
+    .friendMessage{
+      height:55px; 
+      width: 55px;
+      display: block;
+      float: left;
+      margin: 5px 0 0 10px;
+    }
+    .MyMessage{
+      height:55px; 
+      width: 55px;
+      display: block;
+      float: right;
+      margin: 5px 10px 0 0;
+    }
+    .msgInfo{
+      font:bold 14px sans-serif;
+      height:40px;
+      line-height: 40px; 
+      margin: 10px 10px 0 10px;
+      padding: 0 15px;
+      border-radius:5px;
+    }
+    .triangle_left {
+    position: relative;
+    top: 30px;
+    left: 65px;
+    width: 0px;
+    height: 0px;
+    border-top: 5px solid transparent;
+    border-right: 10px solid #d9edf7;
+    border-bottom: 5px solid transparent;
+   }
+   .triangle_right {
+    position: relative;
+    top: 30px;
+    left: 87.8%;
+    width: 0px;
+    height: 0px;
+    border-top: 5px solid transparent;
+    border-left: 10px solid #d9edf7;
+    border-bottom: 5px solid transparent;
+   }
+   .contentName{
+      font:18px sans-serif;
+      height: 45px;
+      margin: 0 auto;
+      display: block;
+      text-align: center;
+      line-height: 60px;
+      border-bottom: 1px solid #E9E9EA;
+   }
+   .chooseItem{
+      width: 50%;
+      text-align: center;
+   }
+   .nav-tabs>li>a{
+      margin-right: 0px;
+   }
+   .gray {
+     -webkit-filter: grayscale(1); /* Webkit */
+     filter: gray(1); /* IE6-9 */
+     filter: grayscale(1); /* W3C */
+
+   }
+   #friendlist a{
+       color: black;
+       text-decoration: none;
+   }
+   #groupslist a{
+       color: black;
+       text-decoration: none;
+   }
+   .contentShow{
+       display: none;
+       float: left;
+   }
+    .tips{
+        display: none;
+    }
+    .headImgSize{
+        float: left;
+        width: 100px;
+        height: 100px;
+        padding-right: 10px;
+    }
+    .infoPadding{
+        padding-bottom: 5px;
+    }
+    .recommedGroup{
+        width: 145px;
+        height: 145px;
+        margin:10px 0 10px 0;
+        text-align: center;
+        display: inline-block;
+    }
+    .title{
+        width:50px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        text-align: center;
+    }
+    .groupNumImgs{
+        position: absolute;
+        top: 43px;
+        left: -1px;
+    }
+    .friendMenu{
+        position: absolute;
+        top: 43px;
+        left: 240px;
+    }
+    .imgWholeStyle{
+        width: 640px;
+        height: 120px;
+        overflow-y: auto;
+    }
+    .imgStyle{
+        height: 60px;
+        width: 60px;
+        display: inline-block;
+        margin-left: 5px;
+    }
+    .imgTempStyle{
+        height: 60px;
+        width: 60px;
+        display: none;
+        margin-left: 5px;
+    }
+  </style>
+  </head>
+  <body class="bg">
+  	<div  id="chatBody">
+			<div class="left">
+				<div id="menu" class="bgcolor">
+					<div id="userInfo">
+            <span id="headimg">
+              <img alt="头像" src="../static/img/2fd765e2.jpg" th:src="@{img/{plocation}(plocation=${session.user.getUserHeadImg()})}" class="img-rounded img-responsive">
+            </span>
+            <span id="name" th:text="${session.user.getUserName()}">
+              LightWing
+            </span>
+            <div id="menu_option">
+              <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span class="glyphicon glyphicon-align-center" aria-hidden="true"></span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                  <li><a href="javaScript:void(0)" onclick="UserLoginOut()">退出</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="javaScript:void(0)" data-toggle="modal" data-target="#createGroup">创建群聊</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div id="search" class="bgcolor">
+            <div class="dropdown">
+                <div class="input-group">
+                    <span class="input-group-addon glyphicon glyphicon-search" id="searrch_ico"></span>
+                    <input id="searchFriend" type="text" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="form-control"placeholder="要搜索先点击下面好友/群组">
+                    <ul class="dropdown-menu" style="width: 320px" id="friendlistGroup">
+                        <li id="friendListItem" class="tips" style="font: 16px sans-serif; height: 26px;">
+                            <span style="padding:5px 0 0 10px" nameAndPhone="name">
+                                姓名（电话）
+                            </span>
+                            <span sign="id" class="tips"></span>
+                            <span sign="userId" class="tips"></span>
+                            <span sign="name" class="tips"></span>
+                            <span sign="headImg" class="tips"></span>
+                            <span sign="state" class="tips"></span>
+                            <a  onclick="addFriends(this)" class="glyphicon glyphicon-plus" style="float: right;font-size: 14px;" href="javascript:void(0)"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+          </div>
+          <div id="frindAndGroup">
+            <ul class="nav nav-tabs">
+              <li role="presentation" class="chooseItem" activeTab="first">
+                <a href="#friendlist" data-toggle="tab" >
+                  好友<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                </a>
+              </li>
+              <li role="presentation" class="chooseItem">
+                <a href="#groupslist" data-toggle="tab">
+                  群组<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div id="friends">
+            <div class="tab-content">
+              <div class="tab-pane fade" id="friendlist">
+                <ul class="list-group pre-scrollable" id="friendGroup">
+                 <!--复制好友框-->
+                 <li class="list-group-item items tips" id="addFriend">
+                    <a >
+                        <div class="frindlistinfo">
+                            <span class="friendsImg">
+                                <img src="../static/img/34cb3f93.jpeg" class="img-rounded img-responsive" >
+                            </span>
+                            <span class="tips"></span>
+                            <h4>姓名</h4>
+                            <p>上线状态</p>
+                            <span class="badge unread" myattr="addUnRead"></span>
+                         </div>
+                    </a>
+                  </li>
+                  <li class="list-group-item items" th:each="friend:${session.friendList}">
+                    <a th:href="@{'#'+${friend.getUserName()}+'_'}" th:name="${friend.getUserName()}+'_'" th:id="${friend.getUserId()}">
+                      <div class="frindlistinfo">
+                      <span class="friendsImg">
+                        <img src="../static/img/34cb3f93.jpeg" class="img-rounded img-responsive" th:src="@{img/{plocation}(plocation=${friend.getUserHeadImg()})}" alt="头像" th:class="${friend.getUserState()==1}?'img-rounded img-responsive':'img-rounded img-responsive gray'">
+                      </span>
+                        <span class="tips" th:value="'user_'+${friend.getId()}"></span>
+                        <h4 th:text="${friend.getUserName()}">姓名</h4>
+                        <p th:text="${friend.getUserState()==1}?'Q我吧':'未上线'">上线状态</p>
+                        <span class="badge unread" th:text="${friend.getSendInformationNum()}" th:class="${friend.getSendInformationNum()>0}?'badge unread':'tips'" myattr="addUnRead">4</span>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="tab-pane fade" id="groupslist">
+                  <ul class="list-group pre-scrollable" id="GroupAdd">
+                      <!--复制群组框-->
+                      <li class="list-group-item items tips" id="addGroup">
+                          <a>
+                              <div class="frindlistinfo">
+                                  <span class="friendsImg">
+                                    <img src="../static/img/f8072d5e.jpg"  alt="头像" class="img-rounded img-responsive">
+                                  </span>
+                                  <span class="tips"></span>
+                                  <h4> 小火车群聊</h4>
+                                  <p>We talk together</p>
+                                  <span class="badge unread tips" myattr="addUnRead">0</span>
+                              </div>
+                          </a>
+                      </li>
+                      <li class="list-group-item items" th:each="group:${session.groupList}">
+                          <a href="#groupName" name="groupName" th:href="@{'#'+${group.getGroupName()}+'_'}"  th:name="${group.getGroupName()}+'_'" th:id="${group.getGuuId()}">
+                              <div class="frindlistinfo">
+                                  <span class="friendsImg">
+                                    <img src="../static/img/f8072d5e.jpg" th:src="@{img/{plocation}(plocation=${group.getGroupImg()})}" alt="头像" class="img-rounded img-responsive">
+                                  </span>
+                                  <span class="tips" th:value="'group_'+${group.getGid()}"></span>
+                                  <h4 th:text="${group.getGroupName()}">小火车群聊</h4>
+                                  <p>
+                                      We talk together
+                                  </p>
+                                  <span class="badge unread tips" myattr="addUnRead">0</span>
+                              </div>
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+            </div>
+          </div>
+		 </div>
+		</div>
+		<div class="right" id="right">
+            <!--添加好友的聊天区域 希望有用-->
+            <div id="copyFriendBox">
+                <div class="tab-pane contentShow tips" >
+                    <div class="contentTopName">
+                        <div class="contentName">
+                            <div style="position: relative;">
+                                <a href="javascript:void(0)"  class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="text-decoration: none">
+                                    register
+                                </a>
+                                <span class="caret"></span>
+                                <ul class="dropdown-menu friendMenu" style="position: relative;">
+                                    <li><a href="javascript:void(0)">拉入群组</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div class="contentMessage tips">
+                            <span class="friendMessage">
+                                <img src="../static/img/headimg01.jpg"  class="img-circle img-responsive">
+                            </span>
+                            <p class="bg-info msgInfo" style="float: left;">LightWing</p>
+                            <div class="triangle_left"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--私聊区域-->
+            <div id="oneByone">
+                <div th:each="us:${session.friendList}">
+                    <div class="tab-pane contentShow" th:id="${us.getUserName()}+'_'">
+                        <div class="contentTopName">
+                            <div class="contentName">
+                                <div style="position: relative;">
+                                    <a href="javascript:void(0)" th:text="${us.getUserName()}" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="text-decoration: none">
+                                        register
+                                    </a>
+                                    <span class="caret"></span>
+                                    <ul class="dropdown-menu friendMenu">
+                                        <li><a  href="javascript:void(0)" th:onclick="getFriendInfo([[${us}]])" data-toggle="modal" data-target="#friendManage">查看好友信息</a></li>
+                                        <li><a href="javascript:void(0)" th:onclick="deleteFriendById([[${us}]])">删除该好友</a></li>
+                                        <li data-toggle="modal" data-target="#mySmallModalLabel">
+                                            <a href="javascript:void(0)">拉入群组</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content" th:id="'user_'+${us.getId()}">
+                            <div class="contentMessage tips" th:id="friendContent" id="friendContent">
+                            <span class="friendMessage">
+                                <img src="../static/img/headimg01.jpg" th:src="@{img/{headimg}(headimg=${us.getUserHeadImg()})}" class="img-circle img-responsive">
+                            </span>
+                                <p class="bg-info msgInfo" style="float: left;">LightWing</p>
+                                <div class="triangle_left"></div>
+                            </div>
+                            <div class="contentMessage tips" id="MyContent"  th:id="MyContent">
+                            <span class=" MyMessage">
+                               <img src="../static/img/headimg.jpeg" th:src="@{img/{MyHead}(MyHead=${session.user.getUserHeadImg()})}" class="img-circle img-responsive">
+                             </span>
+                                <p class="bg-info msgInfo" style="float: right;">无敌的我又回来了</p>
+                                <div class="triangle_right"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--复制群聊区域,希望有用-->
+            <div class="tips" id="copyGroupBox">
+                <div class="tab-pane contentShow">
+                    <div class="contentTopName">
+                        <div class="contentName">
+                            <div style="position: relative;" class="dropdown" flag="dropDown">
+                                <a href="javaScript:void(0);" style="text-decoration: none" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    小火车<span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu groupNumImgs" aria-labelledby="group">
+                                    <li>
+                                        <div class="imgWholeStyle">
+                                            <div class="imgStyle" style="cursor:pointer;" mark="a" onclick="exitGroup(this)">
+                                                <img src="../static/img/exit.png"  class="img-responsive img-circle">
+                                                <h6 style="margin: 0 auto;color: red;" class="title">退群</h6>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <!--有就可以直接用-->
+                    </div>
+                </div>
+            </div>
+            <!--群聊区域-->
+            <div id="oneToMore">
+                <div th:each="group:${session.groupList}">
+                    <div class="tab-pane contentShow" id="groupName" th:id="${group.getGroupName()}+'_'">
+                        <div class="contentTopName">
+                            <div class="contentName">
+                                <div style="position: relative;" class="dropdown" flag="dropDown">
+                                   <a href="javaScript:void(0);" id="group" th:text="${group.getGroupName()}+'群聊'" style="text-decoration: none" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                      小火车<span class="caret"></span>
+                                   </a>
+                                    <ul class="dropdown-menu groupNumImgs" aria-labelledby="group">
+                                        <li>
+                                            <div id="groupImg" class="imgWholeStyle">
+                                                <div class="imgStyle" th:each="groupNum:${group.getUsers()}" th:id="${group.getGroupName()}+'_'+${groupNum.getUserName()}">
+                                                    <img src="../static/img/d680d215.jpg" th:src="@{img/{headimg}(headimg=${groupNum.getUserHeadImg()})}" class="img-responsive img-thumbnail">
+                                                    <h6 style="margin: 0 auto;" class="title" th:text="${groupNum.getUserName()}">LightWing</h6>
+                                                </div>
+                                                <div class="imgStyle" style="cursor:pointer;" onclick="exitGroup(this)" th:tag="${group.groupName}">
+                                                    <img src="../static/img/exit.png"  class="img-responsive img-circle">
+                                                    <h6 style="margin: 0 auto;color: red;" class="title">退群</h6>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content" id="group_GroupId" th:id="'group_'+${group.getGid()}">
+                            <!--有就可以直接用-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 460px"></div>
+          <!--发送消息区-->
+          <div id="message">
+            <div id="emojiBar" class="dropup">
+              <img src="../static/img/emoji.png" title="插入表情" id="insert" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <ul class="dropdown-menu" aria-labelledby="insert">
+                <li>
+                  <div style="width: 620px;height: 120px;" id="emojimg">
+                    <img src="../static/img/emotion.png" onclick="getPosition(event,this)">
+                  </div>
+                </li>
+              </ul>
+            </div>
+              <div contenteditable="true" id="edit"></div>
+              <button type="button" class="btn btn-success" id="sendBut">
+                发送
+                <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+              </button>
+          </div>
+		</div>
+  	</div>
+    <!--群聊消息框-->
+    <div class="contentMessage tips" id="groupContent">
+        <span class="friendMessage">
+            <img src="" class="img-circle img-responsive">
+         </span>
+        <div>
+            <span id="userName" style="position: absolute;"></span>
+            <p class="bg-info msgInfo" style="float: left;margin-top: 25px;">LightWing</p>
+            <div class="triangle_left"></div>
+        </div>
+    </div>
+    <!--拉人提示框-->
+    <div class="alert alert-success tips" role="alert" id="addPeopleSuccess" style="text-align: center;padding: 7px;"></div>
+    <!--退出提示框-->
+    <div class="alert alert-danger tips" role="alert" id="exitTheGroup" style="text-align: center;padding: 7px;"></div>
+    <!--推荐群组-->
+    <div class="modal fade" id="mySmallModalLabel" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="recommedGroup" id="groupTemplate" style="display: none;">
+                    <a href="javascript:void(0)" style="text-decoration: none;">
+                        <div style="height: 110px;width: 110px; margin: auto;">
+                            <img src="../static/img/c03deee4.jpeg" class="img-responsive img-thumbnail">
+                        </div>
+                        <h4>群名</h4>
+                    </a>
+                </div>
+                <div class="recommedGroup" th:each="group:${session.groupList}" th:id="groupTemplate+'_'+${group.groupName}">
+                    <a href="javascript:void(0)" style="text-decoration: none;" th:onclick="inviteUserToGroup([[${group}]])">
+                        <div style="height: 110px;width: 110px; margin: auto;">
+                            <img src="../static/img/c03deee4.jpeg" th:src="@{img/{picture}(picture=${group.getGroupImg()})}" class="img-responsive img-thumbnail">
+                        </div>
+                        <h4 th:text="${group.getGroupName()}">群名</h4>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--搜索群组展示框-->
+    <li id="groupListItem" class="tips" style="font: 16px sans-serif; height: 26px;">
+        <span style="padding:5px 0 0 10px" nameAndPhone="name">
+            群名（群ID）
+        </span>
+        <span sign="gid" class="tips"></span>
+        <span sign="guid" class="tips"></span>
+        <span sign="groupName" class="tips"></span>
+        <span sign="groupImg" class="tips"></span>
+        <a  onclick="addGroups(this)" class="glyphicon glyphicon-plus" style="float: right;font-size: 14px;" href="javascript:void(0)"></a>
+    </li>
+    <!--群组头像框-->
+    <div class="imgTempStyle" id="groupNumHeadImgTemp">
+        <img src="../static/img/d680d215.jpg" class="img-responsive img-thumbnail">
+        <h6 style="margin: 0 auto;" class="title">LightWing</h6>
+    </div>
+    <!--用户信息拟态框-->
+    <div class="modal fade" id="friendManage" tabindex="-1" role="dialog" aria-labelledby="friendManageLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">好友信息</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="height: 100px;">
+                        <div class="headImgSize">
+                            <img src="../static/img/2fd765e2.jpg" class="img-rounded img-responsive">
+                        </div>
+                        <div style="font: bold 18px arial,sans-serif;">
+                            <div class="infoPadding">
+                                <label>姓名：</label>
+                                <span name="userName">百里图书</span>
+                            </div>
+                            <div class="infoPadding">
+                                <label>性别：</label>
+                                <span name="useGender">男</span>
+                            </div>
+                            <div class="infoPadding">
+                                <label>电话号码：</label>
+                                <span name="phoneNum">18393104618</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--创建群组-->
+    <div class="modal fade" id="createGroup" tabindex="-1" role="dialog" >
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">创建群组</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm" th:enctype="${'multipart/form-data'}">
+                        <div class="form-group styleInput">
+                            <label for="createGroupName">群组名</label>
+                            <input id="createGroupName" name="groupName" type="text" class="form-control " placeholder="群名">
+                        </div>
+                        <input id="userId" name="gid" type="text" th:value="${session.user.getId()}" class="tips">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label class="control-label">头像上传:</label>
+                                <input id="input-id" name="blFile"  multiple type="file" data-show-caption="true">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button  class="btn btn-primary" onclick="submitForm()">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../static/jquery/jquery.min.js" th:src="@{jquery/jquery.min.js}"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/fileinput.min.js"></script>
+    <script src="../static/js/bootstrapValidator.min.js"></script>
+    <!-群成员头像/创建群组-->
+    <script>
+        $("div[flag=dropDown]").on('show.bs.dropdown',function () {
+            $(this).find('.dropdown-menu').first().stop(true, true).slideDown();
+        });
+        $('div[flag=dropDown]').on('hide.bs.dropdown', function() {
+            $(this).find('.dropdown-menu').first().stop(true, true).slideUp();
+        });
+        function submitForm() {
+            var data=new FormData(document.getElementById("registerForm"));
+            $.ajax({
+                url:"/addGroup",
+                type:"POST",
+                dataType:"json",
+                data:data,
+                contentType:false,
+                processData:false,
+                success:function (data) {
+                    //MarkDown
+                    dynamicAndGroup(data.gid,data.guuId,data.groupName,data.groupImg);
+                    copyGroupTemplate(data.gid,data.guuId,data.groupName,data.groupImg);
+                    $("#"+data.groupName+"_"+user.userName).remove();
+                    $('#createGroup').modal('hide');
+                    sendMessage('{"packetType":"18","groupUUID":"'+data.guuId+'","userUUID":"'+user.userId+'"}');
+                },
+                error:function () {
+                    alert("异常！");
+                }
+            });
+        }
+    </script>
+    <!--GroupManage-->
+    <script>
+        function inviteUserToGroup(arg) {
+            inviteUserfun(arg.gid,arg.guuId,arg.groupName,arg.groupImg);
+        }
+        function inviteUserfun(id,guuid,groupName,groupImg){
+            sendMessage('{"packetType":"10","groupId":'+id+',"groupUUID":"'+guuid+'","groupName":"'+groupName+'","groupImg":"'+groupImg+'",' +
+                '"toUUID":"'+uuid+'","inviteName":"'+user.userName+'","inviteUserUid":"'+user.userId+'"}');
+            $('#mySmallModalLabel').modal('hide');
+        }
+        function exitGroup(arg) {
+            var groupName=$(arg).attr("tag");
+            $.ajax({
+                url:'/getGroupInfo?groupName='+groupName,
+                dataType:'JSON',
+                success:function (data) {
+                    if(confirm("是否退出该群组？")){
+                        sendMessage('{"packetType":"14","groupUUID":"'+data.guuId+'","gid":'+data.gid+',"groupName":"'+data.groupName+'","userUUID":"'+user.userId+'","userName":"'+user.userName+'"}');
+                        $('#'+groupName+'_').parent().remove();
+                        $("#"+data.guuId).parent().remove();
+                        exitGroupExe(data.gid,user.id);
+                    }
+                }
+            });
+            $("#groupTemplate_"+groupName).remove();
+        }
+        function  exitGroupExe(gid,uid) {
+            $.ajax({
+                url:'/exitGroup',
+                data:{uId:uid,gId:gid},
+                type:'POST',
+                success:function (data) {
+                    console.log(dat.message);
+                }
+            });
+        }
+        function addGroups(arg) {
+            if(confirm("是否添加该群组？")){
+                var prevAll = $(arg).parent().find("span[sign]");
+                $.ajax({
+                    url:'/addGroups',
+                    data:{uId:user.id,gId:prevAll[0].innerText,uuId:user.userId},
+                    type:'post',
+                    success:function (data) {
+                        var json=$.parseJSON(data);
+                        if (json.flag){
+                            alert(json.message);
+                            dynamicAndGroup(prevAll[0].innerText,prevAll[1].innerText,prevAll[2].innerText,prevAll[3].innerText);
+                            copyGroupTemplate(prevAll[0].innerText,prevAll[1].innerText,prevAll[2].innerText,prevAll[3].innerText);
+                            //发送入群通知
+                            var addGroupAnnounciation='{"packetType":"16","gid":'+prevAll[0].innerText+',"uId":"'+user.userId+'"' +
+                                ',"userName":"'+user.userName+'","userImg":"'+user.userHeadImg+'","groupName":"'+prevAll[2].innerText+'","guId":"'+prevAll[1].innerText+'"}';
+                            sendMessage(addGroupAnnounciation);
+                        } else {
+                            alert(json.message);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+    <!--校验-->
+    <script>
+        $(function () {
+            initFileInput("input-id");
+        });
+        $('#createGroup').on('hide.bs.modal', function() {
+            $("#registerForm").data('bootstrapValidator').destroy();
+            $('#registerForm').data('bootstrapValidator',null);
+            formValidator();
+            $("#registerForm")[0].reset();
+        });
+        $(document).ready(formValidator());
+        function formValidator() {
+            $('#registerForm').bootstrapValidator({
+                feedbackIcons:{
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields:{
+                    createGroupName:{
+                        validators:{
+                            notEmpty:{
+                                message:'群名不能为空！'
+                            },
+                            stringLength:{
+                                min:3,
+                                message:'群名长度必须大于3'
+                            },
+                            threshold:3,
+                            remote:{
+                                url:'/checkGroupName',
+                                message:'群名已存在',
+                                delay:1000,
+                                type:'get'
+                            }
+                        }
+                    },
+                    blFile:{
+                        validators:{
+                            notEmpty:{
+                                message:"请上传图片"
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        function initFileInput(ctrlName) {
+            var control = $('#' + ctrlName);
+            control.fileinput({
+                language: 'zh', //设置语言
+                uploadUrl: "upload/insert", //上传的地址
+                allowedFileExtensions: ['jpg', 'gif', 'png','jpeg'],//接收的文件后缀
+                uploadAsync: true, //默认异步上传
+                showUpload: false, //是否显示上传按钮
+                showRemove: true, //显示移除按钮
+                showPreview: true, //是否显示预览
+                showCaption: false,//是否显示标题
+                browseClass: "btn btn-primary", //按钮样式
+                enctype: 'multipart/form-data',
+                validateInitialCount: true,
+                previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+                msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！"
+            });
+        }
+    </script>
+    <!--点击头像显示对应的聊天区-->
+    <script type="text/javascript">
+        var id;
+        var uuid;
+        //点击好友
+        $("#friendlist a").click(function () {
+            var conts=$('.contentShow');
+            for (var i=0;i<conts.length;i++){
+                if (this.name==conts[i].id){
+                    var obj=$(this);
+                    id=$(this).find("span[class='tips']").attr("value");
+                    uuid=$(this).attr("id");
+                    console.log("点击好友列表："+id+":"+uuid);
+                    obj.tab('show');
+                    obj.find("span[class='badge unread']").addClass('tips').text(0);
+                    sendMessage('{"packetType":"7","fromId":"'+uuid+'","toId":"'+userId+'"}');
+                    conts[i].style.display='block';
+                } else {
+                    conts[i].style.display='none';
+                }
+            }
+        });
+        //点击群组
+        $("#groupslist a").click(function () {
+            var conts=$('.contentShow');
+            for (var i=0;i<conts.length;i++){
+                if (this.name==conts[i].id){
+                    var obj=$(this);
+                    id=$(this).find("span[class='tips']").attr("value");
+                    uuid=$(this).attr("id");
+                    obj.tab('show');
+                    obj.find("span[class='badge unread']").addClass('tips').text(0);
+                    conts[i].style.display='block';
+                } else {
+                    conts[i].style.display='none';
+                }
+            }
+        });
+    </script>
+    <!--friendsManage-->
+    <script type="text/javascript" th:inline="javascript">
+        var uId=[[${session.user.Id}]];
+        function getFriendInfo(arg) {
+            $('#friendManage img').attr('src',"../static/img/"+arg.userHeadImg);
+            $('#friendManage span[name="userName"]').text(arg.userName);
+            $('#friendManage span[name="useGender"]').text(arg.userGender);
+            $('#friendManage span[name="phoneNum"]').text(arg.userPhoneNum);
+        }
+        function deleteFriendById(arg) {
+            if(confirm("确定删除该好友？")) {
+                $.ajax({
+                    url: '/deleteFriendByUser?friendId='+arg.id+"&uId="+uId,
+                    type: 'get',
+                    success:function (data) {
+                        if (data){
+                            $('#'+arg.userId).parent().remove();
+                            $('#'+arg.userName+'_').parent().remove();
+                        }else{
+                            alert("删除失败！！");
+                        }
+                    }
+                });
+            }
+        }
+        var last;//在0.5毫秒内没有keyUp就发出请求
+        $("#searchFriend").keyup(function searchUser(event) {
+            last=event.timeStamp;
+            setTimeout(function () {
+                if(last-event.timeStamp==0){
+                    var searchValue=$('#searchFriend').val();
+                    var active = $("#frindAndGroup li[activeTab='first']").hasClass("active");
+                    if (active){
+                        //查找用户名或用户手机号
+                        $.ajax({
+                            url:'/searchUser',
+                            type:'post',
+                            data:{content:searchValue},
+                            dataType:'json',
+                            success:function (data) {
+                                $("#friendlistGroup > li").not(":first").remove();
+                                if (data!=null){
+                                    for (var i=0;i<data.length;i++){
+                                        var elem=$('#friendListItem').clone();
+                                        elem.children("span[nameAndPhone='name']").text(data[i].userName+"("+data[i].userPhoneNum+")");
+                                        elem.children("span[sign='id']").text(data[i].id);
+                                        elem.children("span[sign='userId']").text(data[i].userId);
+                                        elem.children("span[sign='name']").text(data[i].userName);
+                                        elem.children("span[sign='headImg']").text(data[i].userHeadImg);
+                                        elem.children("span[sign='state']").text(data[i].userState);
+                                        elem.removeClass("tips");
+                                        elem.appendTo("#friendlistGroup");
+                                        elem.removeAttr("id");
+                                    }
+                                }
+                            },
+                            error:function (xhr, status, p3, p4) {
+                                var err = "Error " + " " + status + " " + p3;
+                                if (xhr.responseText && xhr.responseText[0] == "{")
+                                    err = JSON.parse(xhr.responseText).message;
+                                console.log(err);
+                            }
+                        });
+                    }else {
+                        //查找群名或GUUID
+                        $.ajax({
+                            url:'/searchGroup',
+                            type:'post',
+                            data:{content:searchValue},
+                            dataType:'json',
+                            success:function (data) {
+                                $("#friendlistGroup > li").not(":first").remove();
+                                if (data!=null){
+                                    for (var i=0;i<data.length;i++){
+                                        var elem=$('#groupListItem').clone();
+                                        elem.children("span[nameAndPhone='name']").text(data[i].groupName+"("+data[i].guuId+")");
+                                        elem.children("span[sign='gid']").text(data[i].gid);
+                                        elem.children("span[sign='guid']").text(data[i].guuId);
+                                        elem.children("span[sign='groupName']").text(data[i].groupName);
+                                        elem.children("span[sign='groupImg']").text(data[i].groupImg);
+                                        elem.removeClass("tips");
+                                        elem.appendTo("#friendlistGroup");
+                                        elem.removeAttr("id");
+                                    }
+                                }
+                            },
+                            error:function (xhr, status, p3, p4) {
+                                var err = "Error " + " " + status + " " + p3;
+                                if (xhr.responseText && xhr.responseText[0] == "{")
+                                    err = JSON.parse(xhr.responseText).message;
+                                console.log(err);
+                            }
+                        });
+                    }
+                }
+
+            },750);
+        });
+        function addFriends(arg){
+            if(confirm("是否添加该用户")){
+                var prevAll = $(arg).parent().find("span[sign]");
+                $.ajax({
+                    url:'/addFriend',
+                    data:{uId:user.id,fId:prevAll[0].innerText,uuId:user.userId},
+                    type:'post',
+                    success:function (data) {
+                        var json=$.parseJSON(data);
+                        if (json.flag){
+                            alert(json.message);
+                            dynamicAddUser(prevAll[0].innerText,prevAll[1].innerText,prevAll[2].innerText,
+                                prevAll[3].innerText,prevAll[4].innerText);
+                            var addFriendRequest='{"packetType":"9","requestId":'+user.id+',"requestUUID":"'+user.userId+'","requestName":"'+user.userName+'",' +
+                                '"requestImg":"'+user.userHeadImg+'","state":'+user.userState+',"toUid":"'+prevAll[1].innerText+'"}';
+                            sendMessage(addFriendRequest);
+                        } else {
+                            alert(json.message);
+                        }
+                    }
+                });
+            }
+        };
+        //动态添加用户
+        function dynamicAddUser(id,uuid,name,img,state){
+            var cloneAddFriend=$("#addFriend").clone(true);
+            var cloneA =cloneAddFriend.find("a");
+            cloneA.attr("href","#"+name+"_");
+            cloneA.attr("name",name+"_");
+            cloneA.attr("id",uuid);
+            var cloneImg=cloneAddFriend.find("img");
+            cloneAddFriend.find("h4").text(name);
+            cloneImg.attr("src","../static/img/"+img);
+            if (state==0){
+                cloneImg.attr("class","img-rounded img-responsive gray");
+                cloneAddFriend.find("p").text("未上线");
+            }else{
+                cloneImg.attr("class","img-rounded img-responsive");
+                cloneAddFriend.find("p").text("Q我吧");
+            }
+            cloneAddFriend.find("span[class='tips']").attr("value","user_"+id);
+            cloneAddFriend.removeClass("tips");
+            cloneAddFriend.appendTo("#friendGroup");
+            cloneAddFriend.removeAttr("id");
+            //添加对应的内容
+            var cloneContentBox= $("#copyFriendBox").clone(true);
+            cloneContentBox.find("div[class='tab-pane contentShow tips']").attr("id",name+"_")
+            cloneContentBox.find("a").text(name);
+            cloneContentBox.find("div[class='content']").attr("id","user_"+id);
+            cloneContentBox.find("img").attr("src","../static/img/"+img);
+            cloneContentBox.find("div[class='contentMessage tips']").attr("id","friendContent");
+            cloneContentBox.find("div[class='tab-pane contentShow tips']").removeClass("tips");
+            cloneContentBox.appendTo("#oneByone");
+            cloneContentBox.removeAttr("id");
+        };
+    </script>
+    <!--开启websocket-->
+    <script th:inline="javascript">
+        var userId=[[${session.user.userId}]];
+        var socket;
+        if (!window.WebSocket){
+            //火狐支持的WebSocket
+            window.WebSocket=window.MozWebSocket;
+        }
+        if(window.WebSocket){
+            socket=new WebSocket("ws://localhost:8888/websocket");
+            socket.onmessage=function (ev) {
+                dealWithMessageFromServer(ev)
+            };
+            socket.onopen=function (ev) {
+                console.log("连接开启！");
+                var loginMessage='{"packetType":"1","uuId":"'+userId+'"}';
+                sendMessage(loginMessage);
+            };
+            socket.onclose=function (ev) {
+                console.log("连接关闭！");
+            };
+        }else {
+            alert("你的浏览器不支持WebSocket！");
+        }
+
+        function sendMessage(message) {
+            if (!window.WebSocket){
+                return;
+            }
+            if (socket.readyState==WebSocket.OPEN){
+                socket.send(message);
+            } else {
+                alert("连接没有开启！");
+            }
+        }
+        function dealWithMessageFromServer(ev) {
+           var jsonObj = JSON.parse(ev.data);
+           switch (jsonObj.packetType) {
+               case 2:changeUserState(jsonObj.uuId);break;
+               case 5:messageFromFriends(jsonObj);break;
+               case 6:initalFriendInfo(jsonObj);break;
+               case 8:groupMessage(jsonObj);break;
+               case 9:addFriendDynamic(jsonObj);break;
+               case 10:addGroupDynamic(jsonObj);break;
+               case 11:addAnnounce(jsonObj);break;
+               case 12:addGroupDynamicResult(jsonObj);break;
+               case 13:LoginOut(jsonObj.uid);break;
+               case 15:exitGroupAnnounciation(jsonObj);break;
+               case 17:addGroupAnnounciation(jsonObj);break;
+               default:console.log(jsonObj.isSuccess);
+           }
+        }
+        function changeUserState(argument) {
+            $('#'+argument+' img').removeClass("gray");
+            $('#'+argument+' p').text("Q我吧");
+        }
+        function LoginOut(argument) {
+            $('#'+argument+' img').addClass("gray");
+            $('#'+argument+' p').text("不在线");
+        }
+        function messageFromFriends(argument) {
+            //如果正在与当前信息发出者聊天
+            var badge=$('#'+argument.fromId);
+            var id=badge.find("span[class='tips']").attr("value");
+            if (argument.fromId==uuid){
+                frindMessageShow(id,argument.message.replace(/!_/g,'"'));
+                sendMessage('{"packetType":"7","fromId":"'+uuid+'","toId":"'+userId+'"}');
+            }else{
+                var spanBadge=badge.find("span[myattr='addUnRead']");
+                spanBadge.removeClass('tips');
+                var num=spanBadge.text();
+                spanBadge.text(num*1+1);
+                frindMessageShow(id,argument.message.replace(/!_/g,'"'));
+            }
+        }
+        function initalFriendInfo(arg) {
+            for(var proId in arg.userInfo){
+                var userinfObj =arg.userInfo[proId];
+                var fromId=userinfObj.fromId;
+                var infoList=userinfObj.infoList;
+                for (var i=0;i<infoList.length;i++){
+                    frindMessageShow(fromId,infoList[i].message);
+                }
+            }
+        }
+        function groupMessage(arg) {
+            console.log(arg.guId);
+            var badge=$('#'+arg.guId);
+            var id=badge.find("span[class='tips']").attr("value");
+            console.log(id);
+            if (arg.guId==uuid){
+                groupMessageShow(id,arg);
+            }else{
+                var spanBadge=badge.find("span[myattr='addUnRead']");
+                spanBadge.removeClass('tips');
+                var num=spanBadge.text();
+                spanBadge.text(num*1+1);
+                groupMessageShow(id,arg);
+            }
+        }
+        function addFriendDynamic(arg) {
+            alert(arg.requestName+"添加你为好友！！！");
+            dynamicAddUser(arg.requestId,arg.requestUUID,arg.requestName,arg.requestImg,arg.state);
+        }
+        function addGroupDynamic(arg){
+            alert(arg.inviteName+"邀请您进入"+arg.groupName+"群聊");
+            dynamicAndGroup(arg.groupId,arg.groupUUID,arg.groupName,arg.groupImg);
+            copyAnnounceGroupTemplate(arg);
+            sendMessage('{"packetType":"12","inviteName":"'+arg.inviteName+'","accpetImg":"'+user.userHeadImg+'","groupName":"'+arg.groupName+'","acceptName":"'+user.userName+'","guuid":"'
+                +arg.groupUUID+'","gid":'+arg.groupId+'}');
+        }
+        function addGroupDynamicResult(arg) {
+            if (!arg.success){
+                alert("对方已经在该群中！！");
+            }
+        }
+        function addAnnounce(arg){
+            cloneSuccessJoinInfo(arg.accpetName,arg.inviteName,arg.guid);
+            cloneGoupHeadImg(arg.accpetName,arg.accpetImg,arg.groupName);
+        }
+        //退出
+        function UserLoginOut() {
+            $.ajax({
+                url: '/outLogin?uuid='+userId+'&id='+user.id,
+                type: 'get',
+                success:function (data) {
+                    window.location.href=data;
+                }
+            });
+            var loginOutMessage='{"packetType":"13","uid":"'+userId+'"}';
+            sendMessage(loginOutMessage);
+        }
+        //退群
+        function exitGroupAnnounciation(arg) {
+            copyExitGroupAnnounciation(arg.gid,arg.userName,arg.groupName);
+        }
+        //加群通知
+        function addGroupAnnounciation(arg){
+            var cloneTipsBox=$("#addPeopleSuccess").clone();
+            cloneTipsBox.text(arg.userName+"进入群聊");
+            cloneTipsBox.removeClass("tips");
+            cloneTipsBox.appendTo("#group_"+arg.gid);
+            cloneTipsBox.removeAttr("id");
+            cloneGoupHeadImg(arg.userName,arg.userImg,arg.groupName);
+        }
+    </script>
+    <script>
+        //复制退出声明
+        function copyExitGroupAnnounciation(gid,userName,groupName) {
+            var exitGroupTemplt = $("#exitTheGroup").clone();
+            exitGroupTemplt.text(userName+"退出该群聊");
+            exitGroupTemplt.removeClass("tips");
+            exitGroupTemplt.appendTo("#group_"+gid);
+            exitGroupTemplt.removeAttr("id");
+            $("#"+groupName+"_"+userName).remove();
+        }
+        //复制推荐群聊模板
+        function copyAnnounceGroupTemplate(arg){
+            copyGroupTemplate(arg.groupId,arg.groupUUID,arg.groupName,arg.groupImg);
+        }
+        //复制推荐群聊
+        function copyGroupTemplate(groupId,groupUUID,groupName,groupImg) {
+            var groupTemplate=$("#groupTemplate").clone();
+            groupTemplate.find("a").on("click",function () {
+                inviteUserfun(groupId,groupUUID,groupName,groupImg);
+            });
+            groupTemplate.find("img").attr("src","/Path/"+groupImg);
+            groupTemplate.find("h4").text(groupName);
+            groupTemplate.removeAttr("style");
+            groupTemplate.appendTo("#mySmallModalLabel div[class='modal-content']");
+            groupTemplate.attr("id","groupTemplate_"+groupName);
+        }
+        //复制群组样板
+        function dynamicAndGroup(id,uuid,name,img) {
+            //test
+            var cloneGroupList=$('#addGroup').clone(true);
+            var groupA=cloneGroupList.find("a");
+            groupA.attr("href","#"+name+"_");
+            groupA.attr("name",name+"_");
+            groupA.attr("id",uuid);
+            cloneGroupList.find("img").attr("src","/Path/"+img);
+            cloneGroupList.find("span[class='tips']").attr("value","group_"+id);
+            cloneGroupList.find("h4").text(name);
+            cloneGroupList.removeAttr("id");
+            cloneGroupList.removeClass("tips");
+            cloneGroupList.appendTo("#GroupAdd");
+
+            var cloneGroupTalk=$("#copyGroupBox").clone(true);
+            cloneGroupTalk.attr("id","cloneGroupBox");
+            cloneGroupTalk.find("div[class='tab-pane contentShow']").attr("id",name+"_");
+            cloneGroupTalk.find("a").text(name);
+            cloneGroupTalk.find("div[mark='a']").attr("tag",name);
+            cloneGroupTalk.find("div[class='content']").attr("id","group_"+id);
+            //通过Ajax获得用户图片信息。
+            $.ajax({
+                url:'/findGroupUser?gid='+id,
+                dataType:'JSON',
+                success:function (data) {
+                    if (data!=null){
+                        for(var num in data){
+                            cloneGoupHeadImg(data[num].userName,data[num].userHeadImg,name);
+                        }
+                    }
+                }
+            });
+            cloneGroupTalk.appendTo("#oneToMore");
+            cloneGroupTalk.removeClass("tips");
+            cloneGroupTalk.removeAttr("id");
+        }
+        //复制头像到群组
+        function cloneGoupHeadImg(username,userImg,id) {
+            var myImgTemp=$("#groupNumHeadImgTemp").clone(true);
+            myImgTemp.attr("id",id+"_"+username);
+            myImgTemp.find("img").attr("src","../static/img/"+userImg);
+            myImgTemp.find("h6").text(username);
+            myImgTemp.removeClass("imgTempStyle");
+            myImgTemp.addClass("imgStyle");
+            myImgTemp.prependTo("#"+id+"_ div[class='imgWholeStyle']");
+            $("#"+id+"_ div[class='imgWholeStyle']")
+        }
+        //复制提示框样板
+        function cloneSuccessJoinInfo(userName,invitedName,id) {
+            var cloneTipsBox=$("#addPeopleSuccess").clone();
+            cloneTipsBox.text(invitedName+"邀请"+userName+"进入群聊");
+            cloneTipsBox.removeClass("tips");
+            //未定
+            cloneTipsBox.appendTo("#group_"+id);
+            cloneTipsBox.removeAttr("id");
+        }
+        //群组复制对象的模板
+        function groupMessageShow(id,arg) {
+            var myMessageBox= $("#groupContent").clone();//复制模板
+            myMessageBox.attr("id","cloneFriendContent");
+            myMessageBox.removeClass("tips");//显示模板
+            myMessageBox.appendTo("#"+id);//添加到消息区
+            $("#cloneFriendContent img").attr("src","../static/img/"+arg.uImg);
+            $("#cloneFriendContent p").html(arg.message.replace(/!_/g,'"'));
+            $("#cloneFriendContent #userName").text(arg.name+"：").removeAttr("id");
+            myMessageBox.removeAttr("id");
+        }
+        //复制聊天对象的模板
+        function frindMessageShow(id,message){
+            if(userIdRegExp.test(id)){
+                var myMessageBox= $("#"+id+" #friendContent").clone();//复制模板
+                myMessageBox.attr("id","cloneFriendContent");
+                myMessageBox.show();//显示模板
+                myMessageBox.appendTo("#"+id);//添加到消息区
+                $("#cloneFriendContent p").html(message);//添加消息
+                myMessageBox.removeAttr("id");
+                //插入信息使滚动条向下滚动
+                $("#"+id).scrollTop($("#"+id).prop("scrollHeight"),200);
+            }else{
+                var myMessageBox= $("#user_"+id+" #friendContent").clone();//复制模板
+                myMessageBox.attr("id","cloneFriendContent");
+                myMessageBox.show();//显示模板
+                myMessageBox.appendTo("#user_"+id);//添加到消息区
+                $("#cloneFriendContent p").html(message);//添加消息
+                myMessageBox.removeAttr("id");
+                //插入信息使滚动条向下滚动
+                $("#user_"+id).scrollTop($("#user_"+id).prop("scrollHeight"),200);
+            }
+
+        }
+    </script>
+    <!--富文本框-->
+    <script type="text/javascript">
+      var editor = document.getElementById('edit');
+      var emojimg = document.getElementById('emojimg');
+      Emotion.setEdit('edit');
+      function getPosition(ev,obj) {
+        var x=Math.floor((ev.pageX-emojimg.offsetParent.offsetParent.offsetParent.offsetLeft-10)/24);
+        var y=Math.floor((ev.pageY+122-emojimg.offsetParent.offsetParent.offsetParent.offsetTop)/24);
+        var emojiNum = x+y*25;
+        if (emojiNum<105) {
+          var image = '<img src="img/icons/' + emojiNum + '.jpg' + '"/>';
+          Emotion.insertHTML(image);
+        }
+      }
+      //获取富文本的光标位置
+      setTimeout(function() {
+        editor.focus();
+      }, 100);
+
+
+      //富文本编辑框的focus事件
+      editor.onfocus = function () {
+        var sel,range;
+        if (window.getSelection && document.createRange) {
+          range = document.createRange();
+          range.selectNodeContents(editor);
+          range.collapse(true);
+          range.setEnd(editor, editor.childNodes.length);
+          range.setStart(editor, editor.childNodes.length);
+          sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        } else if (document.body.createTextRange) {
+          range = document.body.createTextRange();
+          range.moveToElementText(editor);
+          range.collapse(true);
+          range.select();
+        }
+
+        Emotion.saveRange();  //记住光标位置
+      };
+
+      $('#edit').mouseup(function() {
+        Emotion.saveRange();  //记住光标位置
+      });
+
+      $('#edit').keyup(function() {
+        Emotion.saveRange();  //记住光标位置
+      });
+
+      $('#edit').focus(function() {
+        Emotion.saveRange();  //记住光标位置
+      });
+    </script>
+    <!--发送信息-->
+    <script type="text/javascript" th:inline="javascript">
+        var user=[[${session.user}]];
+        var message= $("#edit");
+        var userIdRegExp=new RegExp('user_');
+        var groupIdRegExp=new RegExp('group_');
+        $('#sendBut').click(function () {
+            var myMessageBox= $("#MyContent").clone();//复制模板
+            myMessageBox.attr("id","cloneMyContent")
+            myMessageBox.show();//显示模板
+            myMessageBox.appendTo("#"+id);//添加到消息区
+            var content=message.html();
+            $("#cloneMyContent p").html(content);//添加消息
+            myMessageBox.removeAttr("id");
+            message.text("");
+            //插入信息使滚动条向下滚动
+            $("#"+id).scrollTop($("#"+id).prop("scrollHeight"),200);
+            var trans=content.replace(/\"/g,'!_');
+            if (userIdRegExp.test(id)){
+                var json='{"packetType": "4", "formId":"'+userId+'", "id":"'+id.match(/user_(\S*)/)[1]+'","toId": "'+uuid+'", "message": "'+trans+'"}';
+                sendMessage(json);
+            }
+            if (groupIdRegExp.test(id)){
+                var json='{"packetType": "8", "guId":"'+uuid+'", "uId":"'+ user.userId+'","uImg": "'+user.userHeadImg+'","name":"'+user.userName+'","message": "'+trans+'"}';
+                sendMessage(json);
+            }
+        });
+    </script>
+  </body>
+</html>

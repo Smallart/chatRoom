@@ -1,0 +1,39 @@
+#message{
+  position: relative;
+  width: 640px;
+  height: 164px;
+  box-sizing: border-box;
+  background-color: white;
+  border-radius:0 0 15px 0;
+}
+
+#edit {
+  position:relative;
+  width: 100%;
+  height: 80px;
+  max-height: 80px;
+  overflow-y: auto;
+  border-bottom: none;
+  padding: 10px;
+  line-height: 18px;
+  border: 1px solid #e9e9e9;
+  box-sizing: border-box;
+}
+
+#emojiBar {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  border: 1px solid #e9e9e9;
+  box-sizing: border-box;
+}
+
+#emojiBar img {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+#emojiBar img:hover {
+  cursor: pointer;
+}
